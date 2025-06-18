@@ -1,7 +1,7 @@
 {
   "name": "com.esgaritus.dragdrop",
   "version": "1.0.0",
-  "type": "library",
+  "type": "module",
   "displayName": "Drag and Drop System",
   "description": "Sistema modular de Drag and Drop para Unity",
   "unity": "2021.3",
