@@ -49,6 +49,15 @@ namespace DragNDrop
             
             if(!IsCanvasTransform && GetComponent<Collider>() == null)
                 gameObject.AddComponent<PolygonCollider2D>();
+            
+            if(canvas == null)
+            {
+                canvas = GetComponentInParent<Canvas>();
+                if (canvas == null)
+                {
+                    Debug.LogError("No Canvas found in the scene. Please assign a Canvas to the Draggable component.");
+                }
+            }
         }
         
         #endregion
