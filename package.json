@@ -1,13 +1,13 @@
 {
   "name": "com.esgaritus.dragdrop",
   "version": "1.0.0",
-  "type": "module",
   "displayName": "Drag and Drop System",
-  "description": "Sistema modular de Drag and Drop para Unity",
+  "description": "Drag And Drop system for Unity",
   "unity": "2021.3",
-  "author": {
+  "author": 
+  {
     "name": "Esgaritus",
     "email": "edgardml.ing@gmail.com",
-    "url": "https://github.com/Edgardml/DragDropUPM"
+    "url": "https://github.com/Edgardml"
   }
 }
