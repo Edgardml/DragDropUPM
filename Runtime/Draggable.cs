@@ -7,7 +7,7 @@ namespace DragNDrop
 {
     public abstract class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerUpHandler
     {
-        public Transform refTransform; // Transform: World ; RectTransform: Canvas
+        public Transform refTransform; // Transform: World; RectTransform: Canvas;
         
         public float doubleTapTime = 0.25f;
         
@@ -34,7 +34,6 @@ namespace DragNDrop
         
 
         #endregion
-        
         
         #region MonoBehaviour functions
         
