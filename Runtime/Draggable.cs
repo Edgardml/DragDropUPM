@@ -59,18 +59,17 @@ namespace DragNDrop
         {
             if (IsCanvasTransform)
             {
-                // Offset para UI
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     (RectTransform)refTransform, eventData.position, 
                     canvas.worldCamera, out Vector2 localPointerPos);
-                pointerOffset = refTransform.localPosition - (Vector3)localPointerPos;
+                pointerOffset =  (Vector3)localPointerPos;
             }
             else
             {
                 // Offset para Mundo: calculamos punto de impacto con raycast
                 if (Physics.Raycast(Camera.main.ScreenPointToRay(eventData.position), out RaycastHit hit))
                 {
-                    pointerOffset = refTransform.position - hit.point;
+                    pointerOffset =  hit.point;
                 }
             }
             if(tryingDoubleTap)
