@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace DragNDrop 
 {
-    public class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerUpHandler
+    public abstract class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerUpHandler
     {
         public Transform refTransform; // Transform: World ; RectTransform: Canvas
         
@@ -169,29 +169,17 @@ namespace DragNDrop
         
         #endregion
 
+        #region Abstract functions
+        protected abstract void Tap();
+        protected abstract void DoubleTap();
+        protected abstract void StartDrag();
+        protected abstract void EndDrag();
+        protected abstract void DropOnDropZone(DropZone argDropZone);
+        
+        #endregion
+        
         #region Public functions
-
-        protected virtual void Tap()
-        {
-            Debug.Log("Tap on this object");
-        }
-
-        protected virtual void DoubleTap()
-        {
-            Debug.Log("DoubleTap on this object");
-        }
-
-        protected virtual void StartDrag()
-        {
-            
-            Debug.Log("StartDrag on this object");
-        }
-
-        protected virtual void EndDrag()
-        {
-            Debug.Log("EndDrag on this object");
-        }
-
+        
         protected virtual void Drop(DropZone argDropZone)
         {
             objectCollide = null;
@@ -209,12 +197,11 @@ namespace DragNDrop
                 if (currentDropZone != previousDropZone)
                 {
                     StartCoroutine(CoMoveToDropZone(currentDropZone));
+                    DropOnDropZone(argDropZone);
                 }
             }
-            
-            
-            
         }
+        
 
         protected virtual void DropOnNothing()
         {
