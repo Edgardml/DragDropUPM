@@ -33,6 +33,8 @@ namespace DragNDrop
 
         private RectTransform rectTransform;
         
+        private Coroutine doubleTapCoroutine;
+        
         #region Accesors
         public bool IsCanvasTransform => refTransform is RectTransform;
         
@@ -102,12 +104,18 @@ namespace DragNDrop
                 singleTap = false;
                 DoubleTap();
             }
-            StartCoroutine(CoCheckDoubleTap());
+            if(doubleTapCoroutine == null)
+                doubleTapCoroutine = StartCoroutine(CoCheckDoubleTap());
         }
         public void OnBeginDrag(PointerEventData eventData)
         {
-            StopCoroutine(CoCheckDoubleTap());
+            if (doubleTapCoroutine != null)
+            {
+                StopCoroutine(doubleTapCoroutine);
+                doubleTapCoroutine = null;
+            }
             singleTap = false;
+            tryingDoubleTap = false;
             if (currentState == DraggableState.Waiting)
             {
                 currentState = DraggableState.Dragging;
@@ -117,6 +125,10 @@ namespace DragNDrop
 
         public void OnDrag(PointerEventData eventData)
         {
+            if(doubleTapCoroutine != null)
+                StopCoroutine(doubleTapCoroutine);
+            singleTap = false;
+            tryingDoubleTap = false;
             if (IsCanvasTransform)
             {
                 // Mover UI
@@ -164,7 +176,6 @@ namespace DragNDrop
                     {
                         objectCollide = result.gameObject;
                         Debug.Log("Canvas object hit: " + objectCollide.name);
-                        break;
                     }
                 }
             }
@@ -190,18 +201,9 @@ namespace DragNDrop
                     }
                 }
             }
-
-            if (singleTap)
-            {
-                transform.position = newInitPosition;
-                Tap();
-            }
-            else
-            {
-                Drop(objectCollide?.GetComponent<DropZone>());
-                if (currentState == DraggableState.Dragging)
-                    currentState = DraggableState.Dropped;
-            }
+            Drop(objectCollide?.GetComponent<DropZone>());
+            if (currentState == DraggableState.Dragging)
+                currentState = DraggableState.Dropped;
         }
         
         #endregion
@@ -216,25 +218,6 @@ namespace DragNDrop
         #endregion
         
         #region Public functions
-        
-        protected virtual void Drop(DropZone argDropZone)
-        {
-            objectCollide = null;
-            if (!argDropZone)
-            {
-                DropOnNothing();
-                return;
-            }
-            if(currentDropZone != null)
-                previousDropZone = currentDropZone;
-            currentDropZone = argDropZone;
-            if (currentDropZone != previousDropZone)
-            {
-                StartCoroutine(CoMoveToDropZone(currentDropZone));
-                DropOnDropZone(argDropZone);
-            }
-        }
-        
 
         protected virtual void DropOnNothing()
         {
@@ -290,6 +273,25 @@ namespace DragNDrop
         
         #region Private functions
         
+        private void Drop(DropZone argDropZone)
+        {
+            objectCollide = null;
+            singleTap = false;
+            if (!argDropZone)
+            {
+                DropOnNothing();
+                return;
+            }
+            if(currentDropZone != null)
+                previousDropZone = currentDropZone;
+            currentDropZone = argDropZone;
+            if (currentDropZone != previousDropZone)
+            {
+                StartCoroutine(CoMoveToDropZone(currentDropZone));
+                DropOnDropZone(argDropZone);
+            }
+        }
+        
         #endregion
 
         #region Coroutines
@@ -306,10 +308,17 @@ namespace DragNDrop
         
         IEnumerator CoCheckDoubleTap()
         {
+            singleTap = false;
             tryingDoubleTap = true;
             yield return new WaitForSeconds(doubleTapTime);
             tryingDoubleTap = false;
             singleTap = true;
+            Tap();
+            if (doubleTapCoroutine != null)
+            {
+                StopCoroutine(doubleTapCoroutine);
+                doubleTapCoroutine = null;
+            }
         }
 
         IEnumerator CoMoveToDropZone(DropZone argDropZone)
