@@ -231,6 +231,7 @@ namespace DragNDrop
             tryingDoubleTap = true;
             yield return new WaitForSeconds(doubleTapTime);
             tryingDoubleTap = false;
+            Tap();
         }
 
         IEnumerator CoMoveToDropZone(DropZone argDropZone)
