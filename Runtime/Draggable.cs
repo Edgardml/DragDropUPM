@@ -15,6 +15,8 @@ namespace DragNDrop
         public DropZone currentDropZone;
         public DropZone previousDropZone;
         public Canvas canvas;
+        public bool isInteractable = true;
+        public bool canMove = true;
         
         public DraggableState currentState = DraggableState.Waiting;
         
@@ -38,7 +40,40 @@ namespace DragNDrop
         #region Accesors
         public bool IsCanvasTransform => refTransform is RectTransform;
         
-
+        public bool Interactuable
+        {
+            get => isInteractable;
+            set
+            {
+                isInteractable = value;
+                if (value)
+                {
+                    gameObject.layer = draggableLayer;
+                }
+                else
+                {
+                    gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                }
+            }
+        }
+        
+        public bool CanMove
+        {
+            get => canMove;
+            set
+            {
+                canMove = value;
+                if (value)
+                {
+                    gameObject.layer = draggableLayer;
+                }
+                else
+                {
+                    gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                }
+            }
+        }
+        
         #endregion
         
         #region MonoBehaviour functions
@@ -84,6 +119,9 @@ namespace DragNDrop
         
         public void OnPointerDown(PointerEventData eventData)
         {
+            if(!Interactuable)
+                return;
+            
             if (IsCanvasTransform)
             {
                 RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -109,6 +147,9 @@ namespace DragNDrop
         }
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if(!Interactuable || !canMove)
+                return;
+            
             if (doubleTapCoroutine != null)
             {
                 StopCoroutine(doubleTapCoroutine);
@@ -125,6 +166,9 @@ namespace DragNDrop
 
         public void OnDrag(PointerEventData eventData)
         {
+            if(!Interactuable || !canMove)
+                return;
+            
             if(doubleTapCoroutine != null)
                 StopCoroutine(doubleTapCoroutine);
             singleTap = false;
@@ -157,6 +201,9 @@ namespace DragNDrop
 
         public void OnEndDrag(PointerEventData eventData)
         {
+            if(!Interactuable || !canMove)
+                return;
+            
             if (currentState == DraggableState.Dragging)
             {
                 EndDrag();
@@ -165,6 +212,9 @@ namespace DragNDrop
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if(!Interactuable)
+                return;
+            
             if (IsCanvasTransform)
             {
                 List<RaycastResult> results = new List<RaycastResult>();
@@ -201,9 +251,12 @@ namespace DragNDrop
                     }
                 }
             }
-            Drop(objectCollide?.GetComponent<DropZone>());
+            
             if (currentState == DraggableState.Dragging)
+            {
+                Drop(objectCollide?.GetComponent<DropZone>());
                 currentState = DraggableState.Dropped;
+            }
         }
         
         #endregion
